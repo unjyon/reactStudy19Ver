@@ -27,6 +27,12 @@ import { useRef } from "react";
 
 function App() {
   const ref = useRef(null);
+
+  return (
+    <>
+      <input ref={ref} type="text" />
+    </>
+  );
 }
 
 export default App;
@@ -81,6 +87,51 @@ function App() {
 export default App;
 ```
 
-리액트에서 html 소스에 접근하기 위해서 `document.getElementById('id').focus();`, `document.getElementById('password').focus();` 와 같이 접근할 수 있지만, 리액트에서 권장하지 않는다. 만약 `document.getElementById('id').textContent = '아이디를 입력해주세요';` 와 같이 사용한다면 화면이 바뀌는데 해당 부분은 리액트를 통해서(setState) 변경해야 한다. 만약 `document.getElementById()`를 사용하여 변경한다면 리액트에서는 이 부분이 state가 아니기 때문에 알아듣지 못한다. 물론 화면은 바뀌지만 state 가 두개 - 1.리액트가 관리하는 state (`setErrors({ idError: "아이디를 입력해주세요" })`) 2.직접 돔을 조작해서 화면을을 관리하는 부분 (`document.getElementById("id").textContent = "아이디를 입력해주세요"`) - 가 생기는 셈이기 때문에 관리하기 매우 힘들다. 리액트는 화면을 바꾸는 동작(document 접근하는 방식)을 하지 말라고 권장한다.
+리액트에서 html 소스에 접근하기 위해서 `document.getElementById('id').focus();`, `document.getElementById('password').focus();` 와 같이 접근할 수 있지만, 리액트에서 권장하지 않는다. `document.getElementById('id').textContent = '아이디를 입력해주세요';` 와 같이 사용한다면 화면이 바뀌나 변경될 부분은 리액트를 통해서(setState) 변경해야 한다.
+만약 `document.getElementById()`를 사용하여 변경한다면 리액트에서는 이 부분이 state가 아니기 때문에 알아듣지 못한다. 물론 화면은 바뀌지만 state 가 두개 - 1.리액트가 관리하는 state (`setErrors({ idError: "아이디를 입력해주세요" })`) 2.직접 돔을 조작해서 화면을을 관리하는 부분 (`document.getElementById("id").textContent = "아이디를 입력해주세요"`) - 가 생기는 셈이기 때문에 관리하기 매우 힘들다. 리액트는 화면을 바꾸는 동작(document 접근하는 방식)을 하지 말라고 권장한다.
 
 이렇게 html에 직접 접근하고 싶을 때 ref를 사용하면 된다.
+
+```jsx
+/* src/App.jsx */
+import { useState, useCallback, useRef } from "react";
+import "./App.css";
+//.. 생략
+function App() {
+  const idRef = useRef(null); // 초기값은 null -> {current: null}
+  const [id, setId] = useState("");
+  const [domain, setDomain] = useState(domainList?.[0]?.name);
+  const [password, setPassword] = useState("");
+
+  //.. 생략
+
+  return (
+    <>
+      <div className="input_area">
+        <label htmlFor="id">아이디</label>
+        <input
+          ref={idRef} // <-
+          className={errors && errors.idError ? "error" : ""}
+          type="text"
+          value={id}
+          onChange={(e) => onChangeEmail(e.target.value)}
+        />
+        {domain && <span>@</span>}
+        <select onChange={onChangeDomain} value={domain}>
+          {domainList.map((item, i) => {
+            return (
+              <option key={i} value={item.name}>
+                {item.name}
+              </option>
+            );
+          })}
+          <option value={""}>직접입력</option>
+        </select>
+      </div>
+      //.. 생략
+    </>
+  );
+}
+
+export default App;
+```

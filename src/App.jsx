@@ -8,7 +8,7 @@ const domainList = [
 ];
 
 function App() {
-  const ref = useRef(null);
+  const idRef = useRef(null); // 초기값은 null -> {current: null}
   const [id, setId] = useState("");
   const [domain, setDomain] = useState(domainList?.[0]?.name);
   const [password, setPassword] = useState("");
@@ -83,6 +83,7 @@ function App() {
       <div className="input_area">
         <label htmlFor="id">아이디</label>
         <input
+          ref={idRef}
           className={errors && errors.idError ? "error" : ""}
           type="text"
           value={id}
