@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useRef } from "react";
 import "./App.css";
 
 const domainList = [
@@ -8,6 +8,7 @@ const domainList = [
 ];
 
 function App() {
+  const ref = useRef(null);
   const [id, setId] = useState("");
   const [domain, setDomain] = useState(domainList?.[0]?.name);
   const [password, setPassword] = useState("");
@@ -18,7 +19,6 @@ function App() {
     (e) => {
       setDomain(e.target.value);
       setErrors({ ...errors, idError: "" });
-      // console.log("value:::", e, e.target.value);
     },
     [errors]
   );
@@ -88,7 +88,6 @@ function App() {
           value={id}
           onChange={(e) => onChangeEmail(e.target.value)}
         />
-
         {domain && <span>@</span>}
         <select onChange={onChangeDomain} value={domain}>
           {domainList.map((item, i) => {
