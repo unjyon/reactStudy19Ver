@@ -23,10 +23,14 @@ function App() {
     [errors]
   );
 
-  const onChangeEmail = useCallback((value) => {
-    // console.log("onChangeEmail:::", value);
-    setId(value);
-  }, []);
+  const onChangeEmail = useCallback(
+    (value) => {
+      // console.log("onChangeEmail:::", value);
+      setId(value);
+      setErrors({ ...errors, idError: "" });
+    },
+    [errors]
+  );
 
   const onChangePassword = useCallback(
     (value) => {
