@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import "./App.css";
 
 const domainList = [
@@ -14,19 +14,27 @@ function App() {
   const [loginChecked, setLoginChecked] = useState(false);
   const [errors, setErrors] = useState({});
 
-  const onChangeDomain = useCallback((e) => {
-    setDomain(e.target.value);
-    // console.log("value:::", e, e.target.value);
-  }, []);
+  const onChangeDomain = useCallback(
+    (e) => {
+      setDomain(e.target.value);
+      setErrors({ ...errors, idError: "" });
+      // console.log("value:::", e, e.target.value);
+    },
+    [errors]
+  );
 
   const onChangeEmail = useCallback((value) => {
     // console.log("onChangeEmail:::", value);
     setId(value);
   }, []);
 
-  const onChangePassword = useCallback((value) => {
-    setPassword(value);
-  }, []);
+  const onChangePassword = useCallback(
+    (value) => {
+      setPassword(value);
+      setErrors({ ...errors, passwordError: "" });
+    },
+    [errors]
+  );
 
   const onChangeAutoLogin = useCallback((check) => {
     // console.log("onChangeAutoLogin:::", check);
@@ -44,37 +52,39 @@ function App() {
       if (type === "login") {
         // 이메일 주소(직접입력)가 유효하지 않을때
         if (!id?.trim()) {
-          setErrors({ ...errors, idError: "아이디를 입력해주세요" });
+          setErrors({ idError: "아이디를 입력해주세요" });
           return;
         } else if (!password?.trim()) {
-          setErrors({ ...errors, passwordError: "패스워드를 입력해주세요" });
+          setErrors({ passwordError: "패스워드를 입력해주세요" });
           return;
         } else if (!domain && !checkEmail(id)) {
-          setErrors({ ...errors, idError: "아이디를 입력해주세요" });
+          setErrors({ idError: "아이디를 입력해주세요" });
           return;
         } else {
           const emailAddress = `${id}${domain && "@" + domain}`;
           console.log("로그인 하러 고", emailAddress, password);
+          setErrors({});
+          return;
         }
-
         // 서버로 보내서 로그인
       } else {
         console.log("회원가입");
       }
     },
-    [id, password, domain, checkEmail, errors]
+    [id, password, domain, checkEmail]
   );
 
   return (
     <>
-      <div>
+      <div className="input_area">
         <label htmlFor="id">아이디</label>
         <input
+          className={errors && errors.idError ? "error" : ""}
           type="text"
           value={id}
           onChange={(e) => onChangeEmail(e.target.value)}
         />
-        {errors.idError && <span>{errors.idError}</span>}
+
         {domain && <span>@</span>}
         <select onChange={onChangeDomain} value={domain}>
           {domainList.map((item, i) => {
@@ -87,14 +97,19 @@ function App() {
           <option value={""}>직접입력</option>
         </select>
       </div>
-
-      <label htmlFor="password">패스워드</label>
-      <input
-        type="password"
-        value={password}
-        onChange={(e) => onChangePassword(e.target.value)}
-      />
-      {errors.passwordError && <span>{errors.passwordError}</span>}
+      {errors.idError && <div className="error_message">{errors.idError}</div>}
+      <div className="input_area">
+        <label htmlFor="password">비밀번호</label>
+        <input
+          className={errors && errors.passwordError ? "error" : ""}
+          type="password"
+          value={password}
+          onChange={(e) => onChangePassword(e.target.value)}
+        />
+      </div>
+      {errors.passwordError && (
+        <div className="error_message">{errors.passwordError}</div>
+      )}
       <div className="btn_area">
         <button className="btn" onClick={() => onClickBtn("login")}>
           로그인

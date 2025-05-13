@@ -46,3 +46,28 @@
 .read-the-docs {
   color: #888;
 }
+.input_area {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+.input_area label {
+  display: inline-block;
+  width: 80px;
+}
+.input_area input {
+  height: 25px;
+}
+.input_area select {
+  height: 31px;
+}
+.input_area input.error {
+  border-color: red;
+  border-width: 1px;
+}
+
+.error_message {
+  color: red;
+  font-size: 12px;
+  margin: 2px 0;
+}
