@@ -8,7 +8,8 @@ const domainList = [
 ];
 
 function App() {
-  const idRef = useRef(null); // 초기값은 null -> {current: null}
+  const idInputRef = useRef(null); // 초기값은 null -> {current: null}
+  const passwordInputRef = useRef(null);
   const [id, setId] = useState("");
   const [domain, setDomain] = useState(domainList?.[0]?.name);
   const [password, setPassword] = useState("");
@@ -54,15 +55,18 @@ function App() {
   const onClickBtn = useCallback(
     (type) => {
       if (type === "login") {
-        // 이메일 주소(직접입력)가 유효하지 않을때
         if (!id?.trim()) {
           setErrors({ idError: "아이디를 입력해주세요" });
+          idInputRef.current?.focus();
           return;
         } else if (!password?.trim()) {
           setErrors({ passwordError: "패스워드를 입력해주세요" });
+          passwordInputRef.current?.focus();
           return;
         } else if (!domain && !checkEmail(id)) {
+          // 이메일 주소(직접입력)가 유효하지 않을때
           setErrors({ idError: "아이디를 입력해주세요" });
+          idInputRef.current?.focus();
           return;
         } else {
           const emailAddress = `${id}${domain && "@" + domain}`;
@@ -83,7 +87,7 @@ function App() {
       <div className="input_area">
         <label htmlFor="id">아이디</label>
         <input
-          ref={idRef}
+          ref={idInputRef}
           className={errors && errors.idError ? "error" : ""}
           type="text"
           value={id}
@@ -105,6 +109,7 @@ function App() {
       <div className="input_area">
         <label htmlFor="password">비밀번호</label>
         <input
+          ref={passwordInputRef}
           className={errors && errors.passwordError ? "error" : ""}
           type="password"
           value={password}

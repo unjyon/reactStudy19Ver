@@ -21,6 +21,9 @@ If you are developing a production application, we recommend using TypeScript wi
 
 2. useRef
    데이터 저장장치. 데이터인데, 화면이 바뀌지 않는 데이터다.
+   | useRef는 렌더링에 필요하지 않은 값을 참조할 수 있는 Hook입니다.
+   | current 프로퍼티를 통해 값을 저장하고 접근할 수 있습니다.
+   | 값이 변경되어도 컴포넌트가 재렌더링되지 않습니다.
 
 ```jsx
 import { useRef } from "react";
@@ -98,19 +101,50 @@ import { useState, useCallback, useRef } from "react";
 import "./App.css";
 //.. 생략
 function App() {
-  const idRef = useRef(null); // 초기값은 null -> {current: null}
+  const idInputRef = useRef(null); // 초기값은 null -> {current: null}
+  const passwordInputRef = useRef(null);
   const [id, setId] = useState("");
   const [domain, setDomain] = useState(domainList?.[0]?.name);
   const [password, setPassword] = useState("");
 
   //.. 생략
 
+  const onClickBtn = useCallback(
+    (type) => {
+      if (type === "login") {
+        // 이메일 주소(직접입력)가 유효하지 않을때
+        if (!id?.trim()) {
+          setErrors({ idError: "아이디를 입력해주세요" });
+          idInputRef.current.focus();
+          return;
+        } else if (!password?.trim()) {
+          setErrors({ passwordError: "패스워드를 입력해주세요" });
+          passwordInputRef.current.focus();
+          return;
+        } else if (!domain && !checkEmail(id)) {
+          setErrors({ idError: "아이디를 입력해주세요" });
+          idInputRef.current.focus();
+          return;
+        } else {
+          const emailAddress = `${id}${domain && "@" + domain}`;
+          console.log("로그인 하러 고", emailAddress, password);
+          setErrors({});
+          return;
+        }
+        // 서버로 보내서 로그인
+      } else {
+        console.log("회원가입");
+      }
+    },
+    [id, password, domain, checkEmail]
+  );
+
   return (
     <>
       <div className="input_area">
         <label htmlFor="id">아이디</label>
         <input
-          ref={idRef} // <-
+          ref={idInputRef} // <- idInputRef
           className={errors && errors.idError ? "error" : ""}
           type="text"
           value={id}
@@ -128,6 +162,20 @@ function App() {
           <option value={""}>직접입력</option>
         </select>
       </div>
+      {errors.idError && <div className="error_message">{errors.idError}</div>}
+      <div className="input_area">
+        <label htmlFor="password">비밀번호</label>
+        <input
+          ref={passwordInputRef} // <- passwordInputRef
+          className={errors && errors.passwordError ? "error" : ""}
+          type="password"
+          value={password}
+          onChange={(e) => onChangePassword(e.target.value)}
+        />
+      </div>
+      {errors.passwordError && (
+        <div className="error_message">{errors.passwordError}</div>
+      )}
       //.. 생략
     </>
   );
@@ -135,3 +183,19 @@ function App() {
 
 export default App;
 ```
+
+`<input ref={idInputRef} />`을 풀면 아래와 같다.
+
+```jsx
+<input
+  ref={(node) => {
+    idInputRef.current = node;
+  }}
+/>
+```
+
+idInputRef는 객체로 `{current: null}` 초기값으로 내려오며 html로 읽을 시 `{ current : HTMLInputElement }`로 변한다.
+
+### useRef 는 왜 변하지 않는 데이터인가?
+
+`const idInputRef = useRef(null);` 에서 ref는 객체이기 때문에 ref자체에 변하지 않고 ref안에 있는 current라는 속성만 바뀔 뿐 객체가 바뀌지 않는다. 그렇기에 React 는 Ref의 변화를 감지하니 못한다.
