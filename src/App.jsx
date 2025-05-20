@@ -1,5 +1,7 @@
 import { useState, useCallback, useRef } from "react";
 import "./App.css";
+import EmailInput from "./components/EmailInput";
+import Input from "./components/Input";
 import useEmailInput from "./modules/hooks/useEmailInput";
 import useInput from "./modules/hooks/useInput";
 const domainList = [
@@ -57,41 +59,27 @@ function App() {
 
   return (
     <>
-      <div className="input_area">
-        <label htmlFor="id">아이디</label>
-        <input
-          ref={idInputRef}
-          className={errors && errors.idError ? "error" : ""}
-          type="text"
-          value={id}
-          onChange={(e) => onChangeId(e)}
-        />
-        {domain && <span>@</span>}
-        <select onChange={onChangeDomain} value={domain}>
-          {domainList.map((item, i) => {
-            return (
-              <option key={i} value={item.name}>
-                {item.name}
-              </option>
-            );
-          })}
-          <option value={""}>직접입력</option>
-        </select>
-      </div>
-      {errors.idError && <div className="error_message">{errors.idError}</div>}
-      <div className="input_area">
-        <label htmlFor="password">비밀번호</label>
-        <input
-          ref={passwordInputRef}
-          className={errors && errors.passwordError ? "error" : ""}
-          type="password"
-          value={password}
-          onChange={(e) => onChangePassword(e)}
-        />
-      </div>
-      {errors.passwordError && (
-        <div className="error_message">{errors.passwordError}</div>
-      )}
+      <EmailInput
+        label="아이디"
+        name="id"
+        type="text"
+        value={id}
+        onChangeId={(e) => onChangeId(e)}
+        error={errors && errors.idError}
+        ref={idInputRef}
+        domain={domain}
+        domainList={domainList}
+        onChangeDomain={onChangeDomain}
+      />
+      <Input
+        label="비밀번호"
+        name="password"
+        type="password"
+        value={password}
+        onChange={(e) => onChangePassword(e)}
+        error={errors && errors.passwordError}
+        ref={passwordInputRef}
+      />
       <div className="btn_area">
         <button className="btn" onClick={() => onClickBtn("login")}>
           로그인

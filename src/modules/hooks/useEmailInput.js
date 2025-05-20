@@ -5,8 +5,8 @@ export default function useEmailInput() {
   const [domain, setDomain] = useState("naver.com");
   const idInputRef = useRef(null); // 초기값은 null -> {current: null}
 
-  const onChangeId = useCallback((value) => {
-    setId(value);
+  const onChangeId = useCallback((e) => {
+    setId(e.target.value);
   }, []);
 
   const onChangeDomain = useCallback((e) => {

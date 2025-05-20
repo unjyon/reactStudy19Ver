@@ -6,6 +6,6 @@ import Signup from "./Signup.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <Signup />
+    <App />
   </StrictMode>
 );
