@@ -2,6 +2,8 @@ import { useState, useCallback, useRef } from "react";
 import "./App.css";
 import Input from "./components/Input";
 import EmailInput from "./components/EmailInput";
+import useInput from "./modules/hooks/useInput";
+import useEmailInput from "./modules/hooks/useEmailInput";
 
 const domainList = [
   { name: "naver.com" },
@@ -10,68 +12,17 @@ const domainList = [
 ];
 
 function Signup() {
-  const idInputRef = useRef(null); // 초기값은 null -> {current: null}
-  const passwordInputRef = useRef(null);
-  const nickNameInputRef = useRef(null);
-  const phoneNumbInputRef = useRef(null);
-  const [id, setId] = useState("");
-  const [domain, setDomain] = useState(domainList?.[0]?.name);
-  const [password, setPassword] = useState("");
-  const [nickName, setNickName] = useState("");
-  const [phoneNumb, setPhoneNumb] = useState("");
+  const [password, passwordInputRef, onChangePassword] = useInput();
+  const [nickName, nickNameInputRef, onChangeNickName] = useInput();
+  const [phoneNumb, phoneNumbInputRef, onChangePhoneNumb] = useInput();
+  const [id, domain, idInputRef, onChangeId, onChangeDomain] = useEmailInput();
   const [loginChecked, setLoginChecked] = useState(false);
   const [errors, setErrors] = useState({});
-
-  const onChangeDomain = useCallback(
-    (e) => {
-      setDomain(e.target.value);
-      setErrors({ ...errors, idError: "" });
-    },
-    [errors]
-  );
-
-  const onChangeEmail = useCallback(
-    (value) => {
-      // console.log("onChangeEmail:::", value);
-      setId(value);
-      setErrors({ ...errors, idError: "" });
-    },
-    [errors]
-  );
-
-  const onChangePassword = useCallback(
-    (value) => {
-      setPassword(value);
-      setErrors({ ...errors, passwordError: "" });
-    },
-    [errors]
-  );
 
   const onChangeAutoLogin = useCallback((check) => {
     // console.log("onChangeAutoLogin:::", check);
     setLoginChecked(check);
   }, []);
-
-  const onChangeNickName = useCallback(
-    (value) => {
-      setNickName(value);
-      setErrors({ ...errors, nickNameError: "" });
-    },
-    [errors]
-  );
-
-  const onChangePhoneNumb = useCallback(
-    (value) => {
-      value = value.replace(/[^0-9]/g, "");
-      if (value.length > 11) {
-        value = value.slice(0, 11);
-      }
-      console.log("전화번호 길이 확인ddd", value.length);
-      setPhoneNumb(value);
-      setErrors({ ...errors, phoneNumbError: "" });
-    },
-    [errors]
-  );
 
   const checkEmail = useCallback((value) => {
     const emailRegEx =
@@ -121,7 +72,18 @@ function Signup() {
         console.log("로그인 화면으로 가기기");
       }
     },
-    [id, password, domain, checkEmail, nickName, phoneNumb]
+    [
+      id,
+      password,
+      domain,
+      checkEmail,
+      nickName,
+      phoneNumb,
+      idInputRef,
+      passwordInputRef,
+      nickNameInputRef,
+      phoneNumbInputRef,
+    ]
   );
 
   return (
@@ -131,7 +93,7 @@ function Signup() {
         name="id"
         type="text"
         value={id}
-        onChangeEmail={(e) => onChangeEmail(e.target.value)}
+        onChangeId={(e) => onChangeId(e)}
         error={errors && errors.idError}
         ref={idInputRef}
         domain={domain}
@@ -143,7 +105,7 @@ function Signup() {
         name="password"
         type="password"
         value={password}
-        onChange={(e) => onChangePassword(e.target.value)}
+        onChange={(e) => onChangePassword(e)}
         error={errors && errors.passwordError}
         ref={passwordInputRef}
       />
@@ -151,7 +113,7 @@ function Signup() {
         label="닉네임"
         name="nickName"
         value={nickName}
-        onChange={(e) => onChangeNickName(e.target.value)}
+        onChange={(e) => onChangeNickName(e)}
         error={errors && errors.nickNameError}
         ref={nickNameInputRef}
       />
@@ -160,7 +122,7 @@ function Signup() {
         name="phoneNumb"
         type="tel"
         value={phoneNumb}
-        onChange={(e) => onChangePhoneNumb(e.target.value)}
+        onChange={(e) => onChangePhoneNumb(e)}
         error={errors && errors.phoneNumbError}
         ref={phoneNumbInputRef}
       />

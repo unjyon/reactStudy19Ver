@@ -3,7 +3,7 @@ export default function EmailInput({
   name,
   type,
   value,
-  onChangeEmail,
+  onChangeId,
   onChangeDomain,
   error,
   ref,
@@ -19,7 +19,7 @@ export default function EmailInput({
           className={error ? "error" : ""}
           type={type}
           value={value}
-          onChange={onChangeEmail}
+          onChange={onChangeId}
         />
         {domain && <span>@</span>}
         <select onChange={onChangeDomain} value={domain}>

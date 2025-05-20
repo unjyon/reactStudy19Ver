@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef } from "react";
 import "./App.css";
-
+import useEmailInput from "./modules/hooks/useEmailInput";
+import useInput from "./modules/hooks/useInput";
 const domainList = [
   { name: "naver.com" },
   { name: "gmail.com" },
@@ -8,38 +9,10 @@ const domainList = [
 ];
 
 function App() {
-  const idInputRef = useRef(null); // 초기값은 null -> {current: null}
-  const passwordInputRef = useRef(null);
-  const [id, setId] = useState("");
-  const [domain, setDomain] = useState(domainList?.[0]?.name);
-  const [password, setPassword] = useState("");
+  const [id, domain, idInputRef, onChangeId, onChangeDomain] = useEmailInput();
+  const [password, passwordInputRef, onChangePassword] = useInput();
   const [loginChecked, setLoginChecked] = useState(false);
   const [errors, setErrors] = useState({});
-
-  const onChangeDomain = useCallback(
-    (e) => {
-      setDomain(e.target.value);
-      setErrors({ ...errors, idError: "" });
-    },
-    [errors]
-  );
-
-  const onChangeEmail = useCallback(
-    (value) => {
-      // console.log("onChangeEmail:::", value);
-      setId(value);
-      setErrors({ ...errors, idError: "" });
-    },
-    [errors]
-  );
-
-  const onChangePassword = useCallback(
-    (value) => {
-      setPassword(value);
-      setErrors({ ...errors, passwordError: "" });
-    },
-    [errors]
-  );
 
   const onChangeAutoLogin = useCallback((check) => {
     // console.log("onChangeAutoLogin:::", check);
@@ -79,7 +52,7 @@ function App() {
         console.log("회원가입");
       }
     },
-    [id, password, domain, checkEmail]
+    [id, password, domain, checkEmail, idInputRef, passwordInputRef]
   );
 
   return (
@@ -91,7 +64,7 @@ function App() {
           className={errors && errors.idError ? "error" : ""}
           type="text"
           value={id}
-          onChange={(e) => onChangeEmail(e.target.value)}
+          onChange={(e) => onChangeId(e)}
         />
         {domain && <span>@</span>}
         <select onChange={onChangeDomain} value={domain}>
@@ -113,7 +86,7 @@ function App() {
           className={errors && errors.passwordError ? "error" : ""}
           type="password"
           value={password}
-          onChange={(e) => onChangePassword(e.target.value)}
+          onChange={(e) => onChangePassword(e)}
         />
       </div>
       {errors.passwordError && (
