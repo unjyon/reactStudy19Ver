@@ -199,3 +199,138 @@ idInputRef는 객체로 `{current: null}` 초기값으로 내려오며 html로 �
 ### useRef 는 왜 변하지 않는 데이터인가?
 
 `const idInputRef = useRef(null);` 에서 ref는 객체이기 때문에 ref자체에 변하지 않고 ref안에 있는 current라는 속성만 바뀔 뿐 객체가 바뀌지 않는다. 그렇기에 React 는 Ref의 변화를 감지하니 못한다.
+
+
+
+
+# useMemo, useCallback (강의 12)
+
+state, 부모가 바뀌면 자식도 바뀌기에 해당 인풋에 값을 변경할때마다 전체가 렌더링이 된다.
+
+이를 최적화 하는 방법 -> memo로 바뀌면 자식이 바뀔때 props 가 바꼈는지 참조한다.
+
+onChange 는 매번 바뀌기 때문에 문제가 된다. 그래서 onChange 는 useCallback 으로 감싼다. 
+ 
+ 함수의 참조 -> useCallback
+ 객체의 참조 -> useMemo
+
+ 
+
+```
+import { memo } from "react";
+
+function Input({
+  label,
+  name,
+  type = "text",
+  value,
+  onChange,
+  error,
+  ref,
+  ...props
+}) {
+  return (
+    <>
+      <div className="input_area">
+        <label htmlFor={name}>{label}</label>
+        <input
+          type={type}
+          id={name}
+          className={error ? "error" : ""}
+          ref={ref}
+          value={value}
+          onChange={onChange}
+          {...props}
+        />
+      </div>
+      {error && <div className="error_message">{error}</div>}
+    </>
+  );
+}
+
+export default memo(Input);
+```
+
+```
+import { memo } from "react";
+
+function EmailInput({
+  label,
+  name,
+  type,
+  value,
+  onChangeId,
+  onChangeDomain,
+  error,
+  ref,
+  domain,
+  domainList,
+}) {
+  return (
+    <>
+      <div className="input_area">
+        <label htmlFor={name}>{label}</label>
+        <input
+          ref={ref}
+          className={error ? "error" : ""}
+          type={type}
+          value={value}
+          onChange={onChangeId}
+        />
+        {domain && <span>@</span>}
+        <select onChange={onChangeDomain} value={domain}>
+          {domainList.map((item, i) => {
+            return (
+              <option key={i} value={item.name}>
+                {item.name}
+              </option>
+            );
+          })}
+          <option value={""}>직접입력</option>
+        </select>
+      </div>
+      {error && <div className="error_message">{error}</div>}
+    </>
+  );
+}
+
+export default memo(EmailInput);
+```
+
+```
+import { useState, useRef, useCallback } from "react";
+
+export default function useInput(initialValue) {
+  const [value, setValue] = useState(initialValue);
+  const ref = useRef(null);
+
+  const onChange = useCallback((e) => {
+    setValue(e.target.value);
+  }, []); 
+
+  return [value, ref, onChange];
+}
+```
+
+```
+import { useState, useRef, useCallback } from "react";
+
+export default function useEmailInput() {
+  const [id, setId] = useState("");
+  const [domain, setDomain] = useState("naver.com");
+  const idInputRef = useRef(null); // 초기값은 null -> {current: null}
+
+  const onChangeId = useCallback((e) => {
+    setId(e.target.value);
+  }, []);
+
+  const onChangeDomain = useCallback((e) => {
+    setDomain(e.target.value);
+  }, []);
+
+  return [id, domain, idInputRef, onChangeId, onChangeDomain];
+  // -> return 하는 부분에 배열이던 객체던 상관 없다. 마음대로 해도 됨.
+}
+
+
+```

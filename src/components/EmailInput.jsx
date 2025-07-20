@@ -1,4 +1,6 @@
-export default function EmailInput({
+import { memo } from "react";
+
+function EmailInput({
   label,
   name,
   type,
@@ -37,3 +39,5 @@ export default function EmailInput({
     </>
   );
 }
+
+export default memo(EmailInput);
