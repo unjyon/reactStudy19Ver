@@ -216,7 +216,7 @@ onChange 는 매번 바뀌기 때문에 문제가 된다. 그래서 onChange 는
 
  
 
-```
+```js
 import { memo } from "react";
 
 function Input({
@@ -251,7 +251,7 @@ function Input({
 export default memo(Input);
 ```
 
-```
+```js
 import { memo } from "react";
 
 function EmailInput({
@@ -297,7 +297,7 @@ function EmailInput({
 export default memo(EmailInput);
 ```
 
-```
+```js
 import { useState, useRef, useCallback } from "react";
 
 export default function useInput(initialValue) {
@@ -312,7 +312,7 @@ export default function useInput(initialValue) {
 }
 ```
 
-```
+```js
 import { useState, useRef, useCallback } from "react";
 
 export default function useEmailInput() {
@@ -333,4 +333,59 @@ export default function useEmailInput() {
 }
 
 
+```
+
+
+# React Router (강의 13)
+
+터미널에 react-router, react-router-dom 설치
+
+```
+npm i react-router
+npm i react-router-dom
+```
+
+### router 
+브라우저의 주소가 바꿀 때 그에 따라 화면도 같이 바뀐다.
+
+
+기존 App.jsx 에 있던 로그인 소스는 Login.jsx 페이지를 만들어서 해당 소스를 옮기고 App.jsx 는 아래와 같이 바꾼다
+```jsx
+//App.jsx
+import "./App.css";
+import { Link } from "react-router-dom";
+
+function App() {
+  return (
+    <>
+      <Link to="/signup">회원가입</Link> {/* a href 태그 대신 사용 */}
+      <Link to="/login">로그인</Link>
+      <Outlet />
+    </>
+  );
+
+}
+
+export default App;
+
+```
+
+main.jsx 파일에서 BrowserRouter 로 감싸준다
+
+```jsx
+import { createRoot } from "react-dom/client";
+import "./index.css";
+import App from "./App.jsx";
+import Signup from "./Signup.jsx";
+import { BrowserRouter } from "react-router-dom";
+
+createRoot(document.getElementById("root")).render(
+  <BrowserRouter>
+    <Routes>
+      <Route index element={<App />} />  {/* 기본 주소 */}
+      <Route path="/signup" element={<Signup />} />
+      <Route path="/login" element={<Login />} />
+    </Routes>
+  </BrowserRouter>
+);
 ```
